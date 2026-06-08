@@ -1,8 +1,10 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import { JEELIZVTOWIDGET } from 'jeelizvtowidget'
 import { DEFAULT_SKU } from '../data/glasses'
-import GlassesSelector from './GlassesSelector'
-import modlinkLogo from '../assets/modlink_logo.webp'
+import { useFrameFilters } from '../hooks/useFrameFilters'
+import FrameFilters from './FrameFilters'
+import FrameList from './FrameList'
+import modlinkLogo from '../assets/modlink_logo_gray.webp'
 
 const ERROR_MESSAGES = {
   WEBCAM_UNAVAILABLE: 'Camera access is required. Please allow camera permissions and try again.',
@@ -31,13 +33,28 @@ function initVTOWidget(placeHolder, canvas, callbacks) {
 export default function AppCanvas() {
   const refPlaceHolder = useRef(null)
   const refCanvas = useRef(null)
-  const refSidebar = useRef(null)
 
   const [isReady, setIsReady] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isAdjustMode, setIsAdjustMode] = useState(false)
   const [selectedSku, setSelectedSku] = useState(DEFAULT_SKU)
   const [error, setError] = useState(null)
+
+  const {
+    query,
+    setQuery,
+    brand,
+    setBrand,
+    type,
+    setType,
+    color,
+    setColor,
+    filteredModels,
+    hasActiveFilters,
+    clearFilters,
+    filterOptions,
+    totalCount,
+  } = useFrameFilters()
 
   const handleSelectModel = useCallback((sku) => {
     setSelectedSku(sku)
@@ -74,43 +91,14 @@ export default function AppCanvas() {
     }
   }, [])
 
-  useEffect(() => {
-    const viewer = refPlaceHolder.current
-    const sidebar = refSidebar.current
-    if (!viewer || !sidebar) return
-
-    const syncSidebarHeight = () => {
-      if (window.matchMedia('(min-width: 1024px)').matches) {
-        sidebar.style.height = `${viewer.offsetHeight}px`
-      } else {
-        sidebar.style.height = ''
-      }
-    }
-
-    syncSidebarHeight()
-
-    const resizeObserver = new ResizeObserver(syncSidebarHeight)
-    resizeObserver.observe(viewer)
-    window.addEventListener('resize', syncSidebarHeight)
-
-    return () => {
-      resizeObserver.disconnect()
-      window.removeEventListener('resize', syncSidebarHeight)
-    }
-  }, [])
-
   return (
-    <div className="flex min-h-full flex-col">
-      <header className="sticky top-0 z-20 border-b border-ink-200/80 bg-white/80 backdrop-blur-md">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-4">
-            <img
-              src={modlinkLogo}
-              alt="Mod Link"
-              className="h-8 w-auto sm:h-9"
-            />
-            <div className="hidden h-6 w-px bg-ink-200 sm:block" aria-hidden="true" />
-            <p className="hidden text-sm font-medium text-ink-500 sm:block">Virtual Try-On</p>
+    <div className="flex h-screen flex-col overflow-hidden bg-ink-950">
+      <header className="shrink-0 border-b border-ink-800 bg-ink-900/90 backdrop-blur-md">
+        <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3">
+            <img src={modlinkLogo} alt="Mod Link" className="h-7 w-auto sm:h-8" />
+            <div className="hidden h-5 w-px bg-ink-700 sm:block" aria-hidden="true" />
+            <p className="hidden text-sm font-medium text-ink-400 sm:block">Virtual Try-On</p>
           </div>
 
           {isReady && !isAdjustMode && (
@@ -118,7 +106,7 @@ export default function AppCanvas() {
               type="button"
               onClick={enterAdjustMode}
               disabled={isLoading}
-              className="rounded-full border border-ink-200 bg-white px-4 py-2 text-sm font-semibold text-ink-700 transition hover:border-ink-300 hover:bg-ink-50 disabled:cursor-not-allowed disabled:opacity-45"
+              className="rounded-full border border-ink-700 bg-ink-800 px-3.5 py-1.5 text-sm font-semibold text-ink-200 transition hover:border-ink-600 hover:bg-ink-700 disabled:cursor-not-allowed disabled:opacity-45"
             >
               Adjust fit
             </button>
@@ -126,84 +114,87 @@ export default function AppCanvas() {
         </div>
       </header>
 
-      <main className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:gap-8 lg:px-8 lg:py-8">
-        <div
-          ref={refPlaceHolder}
-          className="relative mx-auto aspect-[3/4] w-full max-h-[min(72vh,680px)] overflow-hidden rounded-2xl border border-ink-200 bg-ink-950 shadow-viewer lg:mx-0 lg:max-h-[calc(100vh-10rem)]"
-        >
-          <canvas ref={refCanvas} className="viewer-canvas" />
+      <main className="mx-auto flex w-full max-w-7xl min-h-0 flex-1 flex-col gap-3 overflow-hidden px-4 py-3 sm:px-6 lg:gap-4 lg:px-8">
+        <FrameFilters
+          query={query}
+          onQueryChange={setQuery}
+          brand={brand}
+          onBrandChange={setBrand}
+          type={type}
+          onTypeChange={setType}
+          color={color}
+          onColorChange={setColor}
+          brands={filterOptions.brands}
+          types={filterOptions.types}
+          colors={filterOptions.colors}
+          resultCount={filteredModels.length}
+          totalCount={totalCount}
+          hasActiveFilters={hasActiveFilters}
+          onClear={clearFilters}
+        />
 
-          {isLoading && (
-            <div
-              className="absolute inset-0 z-[3] flex flex-col items-center justify-center gap-3 bg-white/90"
-              aria-live="polite"
-              aria-busy="true"
-            >
-              <div
-                className="h-10 w-10 animate-spin rounded-full border-4 border-ink-200 border-t-ink-700"
-                aria-hidden="true"
-              />
-              <p className="text-sm font-medium text-ink-600">Loading…</p>
-            </div>
-          )}
-
-          {isAdjustMode && (
-            <div className="absolute inset-x-0 bottom-0 z-[4] flex items-center justify-between gap-3 bg-gradient-to-t from-ink-950/90 to-ink-950/50 px-4 py-4 backdrop-blur-sm">
-              <p className="text-sm text-ink-200">Drag to reposition the frames</p>
-              <button
-                type="button"
-                onClick={exitAdjustMode}
-                className="shrink-0 rounded-full bg-mint-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-mint-600"
-              >
-                Done
-              </button>
-            </div>
-          )}
-        </div>
-
-        <aside className="flex w-full flex-col lg:w-[340px]">
+        <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 overflow-hidden max-lg:grid-rows-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-4">
           <div
-            ref={refSidebar}
-            className="flex min-h-0 flex-col overflow-hidden rounded-2xl border border-ink-200 bg-white p-5 shadow-card sm:p-6"
+            ref={refPlaceHolder}
+            className="relative h-full min-h-0 w-full overflow-hidden rounded-2xl border border-ink-800 bg-black shadow-viewer"
           >
-            {error && (
+            <canvas ref={refCanvas} className="viewer-canvas" />
+
+            {isLoading && (
               <div
-                className="mb-5 flex shrink-0 items-start justify-between gap-3 rounded-xl border border-coral-500/25 bg-coral-500/10 px-4 py-3"
-                role="alert"
+                className="absolute inset-0 z-[3] flex flex-col items-center justify-center gap-3 bg-ink-950/85 backdrop-blur-sm"
+                aria-live="polite"
+                aria-busy="true"
               >
-                <p className="text-sm text-coral-600">{error}</p>
-                <button
-                  type="button"
-                  onClick={() => setError(null)}
-                  className="shrink-0 text-xs font-semibold uppercase tracking-wide text-coral-500 hover:text-coral-600"
-                >
-                  Dismiss
-                </button>
+                <div
+                  className="h-9 w-9 animate-spin rounded-full border-4 border-ink-700 border-t-mint-400"
+                  aria-hidden="true"
+                />
+                <p className="text-sm font-medium text-ink-300">Loading…</p>
               </div>
             )}
 
-            <div className="hidden min-h-0 flex-1 flex-col lg:flex">
-              <GlassesSelector
-                selectedSku={selectedSku}
-                onSelect={handleSelectModel}
-                disabled={!isReady || isLoading || isAdjustMode}
-                layout="vertical"
-              />
-              <p className="mt-4 shrink-0 text-center text-xs text-ink-400">
-                Center your face in the camera view for the best preview
-              </p>
-            </div>
-
-            <div className="lg:hidden">
-              <GlassesSelector
-                selectedSku={selectedSku}
-                onSelect={handleSelectModel}
-                disabled={!isReady || isLoading || isAdjustMode}
-                layout="horizontal"
-              />
-            </div>
+            {isAdjustMode && (
+              <div className="absolute inset-x-0 bottom-0 z-[4] flex items-center justify-between gap-3 bg-gradient-to-t from-black/90 to-black/50 px-4 py-3 backdrop-blur-sm">
+                <p className="text-sm text-ink-300">Drag to reposition the frames</p>
+                <button
+                  type="button"
+                  onClick={exitAdjustMode}
+                  className="shrink-0 rounded-full bg-mint-500 px-4 py-1.5 text-sm font-semibold text-ink-950 transition hover:bg-mint-400"
+                >
+                  Done
+                </button>
+              </div>
+            )}
           </div>
-        </aside>
+
+          <aside className="flex h-full min-h-0 flex-col overflow-hidden">
+            <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-ink-800 bg-ink-900 p-2.5 shadow-card sm:p-3">
+              {error && (
+                <div
+                  className="mb-2 flex shrink-0 items-start justify-between gap-2 rounded-lg border border-coral-500/30 bg-coral-500/10 px-3 py-2"
+                  role="alert"
+                >
+                  <p className="text-xs text-coral-300">{error}</p>
+                  <button
+                    type="button"
+                    onClick={() => setError(null)}
+                    className="shrink-0 text-xs font-semibold text-coral-400 hover:text-coral-300"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              )}
+
+              <FrameList
+                models={filteredModels}
+                selectedSku={selectedSku}
+                onSelect={handleSelectModel}
+                disabled={!isReady || isLoading || isAdjustMode}
+              />
+            </div>
+          </aside>
+        </div>
       </main>
     </div>
   )

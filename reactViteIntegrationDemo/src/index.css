@@ -8,15 +8,15 @@
   html,
   body,
   #root {
-    @apply h-full;
+    @apply h-screen overflow-hidden;
   }
 
   body {
-    @apply m-0 font-sans text-ink-900 antialiased;
+    @apply m-0 bg-ink-950 font-sans text-ink-100 antialiased;
     background:
-      radial-gradient(ellipse 70% 45% at 100% 0%, rgba(16, 185, 129, 0.08), transparent),
-      radial-gradient(ellipse 60% 40% at 0% 100%, rgba(244, 63, 94, 0.06), transparent),
-      theme('colors.ink.50');
+      radial-gradient(ellipse 70% 45% at 100% 0%, rgba(16, 185, 129, 0.1), transparent),
+      radial-gradient(ellipse 60% 40% at 0% 100%, rgba(59, 130, 246, 0.08), transparent),
+      theme('colors.ink.950');
   }
 }
 
@@ -29,6 +29,6 @@
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: theme('colors.ink.300') transparent;
+    scrollbar-color: theme('colors.ink.600') transparent;
   }
 }

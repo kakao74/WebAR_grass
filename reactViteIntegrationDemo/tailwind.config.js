@@ -14,8 +14,8 @@ export default {
           600: '#3f5580',
           700: '#344468',
           800: '#2d3a56',
-          900: '#28324a',
-          950: '#1a2133',
+          900: '#1e2738',
+          950: '#121820',
         },
         coral: {
           400: '#fb7185',
@@ -32,8 +32,8 @@ export default {
         sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
-        viewer: '0 25px 50px -12px rgba(26, 33, 51, 0.35)',
-        card: '0 4px 24px rgba(26, 33, 51, 0.08)',
+        viewer: '0 25px 50px -12px rgba(0, 0, 0, 0.55)',
+        card: '0 4px 24px rgba(0, 0, 0, 0.35)',
       },
     },
   },
