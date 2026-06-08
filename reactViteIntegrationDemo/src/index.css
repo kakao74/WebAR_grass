@@ -1,84 +1,34 @@
-html {
-  margin: 0;
-  text-align: center;
-  overflow: hidden;
-  background-color: white;
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    @apply h-full;
+  }
+
+  body {
+    @apply m-0 font-sans text-ink-900 antialiased;
+    background:
+      radial-gradient(ellipse 70% 45% at 100% 0%, rgba(16, 185, 129, 0.08), transparent),
+      radial-gradient(ellipse 60% 40% at 0% 100%, rgba(244, 63, 94, 0.06), transparent),
+      theme('colors.ink.50');
+  }
 }
 
-body {
-  margin: 0;
-  width: 100vw;
+@layer components {
+  .viewer-canvas {
+    @apply absolute inset-0 z-[1] h-full w-full;
+  }
 }
 
-.JeelizVTOWidget {
-  width: 100vw;
-  height: 100vh;
-  max-width: 100vh;
-  max-height: 100vw;
-  margin-left: auto;
-  margin-right: auto;
-  position: relative;
-}
-.JeelizVTOWidgetCanvas {
-  position: absolute;
-  z-index: 1;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-}
-.JeelizVTOWidgetControls {
-  position: absolute;
-  z-index: 2;
-  width: 100%;
-}
-.JeelizVTOWidgetButton {
-  cursor: pointer;
-  background: rgba(0, 0, 0, 0.5);
-  color: #ddd;
-  font-weight: bold;
-  font-variant: small-caps;  
-  font-size: 16px;
-  padding: 8px;
-  min-width: 120px;
-  border: none;
-  margin: 8px;
-}
-.JeelizVTOWidgetAdjustEnterButton {
-  
-}
-.JeelizVTOWidgetAdjustNotice {
-  width: 100%;
-  position: absolute;
-  background-color: rgba(0,0,0,0.5);
-  color: white;
-  z-index: 3;
-  font-size: 16px;
-  bottom: 0;  
-  justify-content: center;
-  padding-top: 2em;
-  padding-bottom: 2em;
-  display: none;
-}
-.JeelizVTOWidgetAdjustExitButton {
-  position: absolute;
-  right: 8px;
-  bottom: 8px;
-}
-.JeelizVTOWidgetLoading {
-  position: fixed;
-  z-index: 4;
-  cursor: wait;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0,0,0,0.5);
-}
-.JeelizVTOWidgetLoadingText {
-  color: white;
-  font-size: 32pt;
-  margin-top: 40vh;
-}
-.JeelizVTOWidgetChangeModelContainer {
-  bottom: 0;
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.ink.300') transparent;
+  }
 }

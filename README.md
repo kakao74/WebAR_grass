@@ -60,9 +60,15 @@ Here are the most important reasons why you should consider adding a virtual try
 
 ### Included in this repository
 
-* [Static Integration demo (`index.html` of this repository)](https://jeeliz.com/demos/jeelizWidgetGitPublicDemo)
-<!--* [React/Webpack/NodeJS 12 Integration demo](/reactIntegrationDemo) -->
-* [React/Vite/NodeJS 18 Integration demo](/reactViteIntegrationDemo)
+* [React/Vite integration demo](/reactViteIntegrationDemo)
+
+To run locally:
+
+```bash
+cd reactViteIntegrationDemo
+npm install
+npm run dev
+```
 
 ### Demo app
 
